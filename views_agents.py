@@ -237,7 +237,7 @@ def render_pathfinder(student_id: str, student_name: str, model: str) -> None:
         budget = st.number_input("Budget PKR/year (0 = not stated)", 0, 20_000_000, 0, 10_000)
         saved = st.form_submit_button("Save profile", type="primary")
     if saved:
-        st.session_state.pf_profile = StudentProfile(
+        st.session_state.pathfinder_profile = StudentProfile(
             name=student_name, education=education, stream=stream.strip(), subjects=[s.strip() for s in subjects.split(",") if s.strip()],
             ssc_pct=ssc or None, hssc_pct=hssc or None, tests_taken=[s.strip() for s in tests.split(",") if s.strip()], age=age or None,
             domicile=domicile.strip(), interests=interests.strip(), strengths=strengths.strip(), goals=goals.strip(),
@@ -246,7 +246,7 @@ def render_pathfinder(student_id: str, student_name: str, model: str) -> None:
         web_tools.reset_cache()
         st.success("Profile saved. Run the agents below.")
 
-    profile: StudentProfile | None = st.session_state.get("pf_profile")
+    profile: StudentProfile | None = st.session_state.get("pathfinder_profile")
     if not profile:
         st.info("Fill in and save your profile to start.")
         return
