@@ -11,5 +11,3 @@ crewai==1.15.22
 litellm>=1.84,<2
 numpy>=2.0,<3.0
 gTTS>=2.5,<3
-
-streamlit-autorefresh>=1.0.1,<2

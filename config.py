@@ -26,11 +26,6 @@ UI_COLORS = {
     "Orange": "#EA580C",
     "Red": "#DC2626",
 }
-UI_THEMES = ["System", "Light", "Dark"]
-FONT_SIZES = {"Small": 85, "Medium": 100, "Large": 115, "Extra Large": 130}
-DEFAULT_THEME = "System"
-DEFAULT_FONT_SIZE = "Medium"
-
 
 from mastery_model import MASTERY_LABELS  # noqa: E402,F401  (kept here for backwards compatibility)
 

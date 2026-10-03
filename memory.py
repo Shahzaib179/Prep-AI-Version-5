@@ -81,19 +81,6 @@ class LongTermMemory:
             rows = con.execute("SELECT * FROM memories WHERE student_id=? AND is_active=1 ORDER BY id DESC LIMIT ?", (self.student_id, limit)).fetchall()
         return [dict(r) for r in rows]
 
-    def stats(self) -> dict[str, Any]:
-        """Return count and approximate on-disk size for this student's semantic memory."""
-        vector_bytes = sum(p.stat().st_size for p in self.root.glob("*") if p.is_file())
-        with connect() as con:
-            row = con.execute(
-                "SELECT COUNT(*) AS n FROM memories WHERE student_id=? AND is_active=1",
-                (self.student_id,),
-            ).fetchone()
-        return {
-            "count": int(row["n"] if row else 0),
-            "vector_bytes": int(vector_bytes),
-        }
-
     def clear(self) -> None:
         with connect() as con:
             con.execute("DELETE FROM memories WHERE student_id=?", (self.student_id,))
