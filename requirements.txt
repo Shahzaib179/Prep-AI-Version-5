@@ -7,7 +7,11 @@ python-docx==1.2.0
 reportlab==5.0.1
 gdown==6.4.0
 ddgs==9.16.0
-crewai==1.15.22
+crewai[litellm]==1.15.22
 litellm>=1.84,<2
 numpy>=2.0,<3.0
 gTTS>=2.5,<3
+requests>=2.31
+beautifulsoup4>=4.12
+pandas>=2.0
+pydantic>=2.0

@@ -1,0 +1,20 @@
+{
+  "note": "Starter map of WHERE to verify recognition/accreditation. Names and websites can change - confirm on the official site before relying on them.",
+  "always_check": [
+    "Is the institution on the HEC list of recognised universities/degree-awarding institutes (hec.gov.pk)?",
+    "Is the specific PROGRAM/campus accredited by the relevant council for the profession?",
+    "Does the intake year/campus you want appear on the official page (not only on an agent or aggregator site)?"
+  ],
+  "fields": [
+    {"keywords": ["medicine", "mbbs", "medical", "dentistry", "bds", "dental"], "regulator": "PMDC (Pakistan Medical and Dental Council)", "key": "PMDC", "check": "College recognised for MBBS/BDS and permitted intake; graduates need PMDC registration/licensing exams."},
+    {"keywords": ["engineering", "civil", "electrical", "mechanical", "chemical", "software engineering"], "regulator": "PEC (Pakistan Engineering Council)", "key": "PEC", "check": "Program accredited by PEC (needed for PEC registration as an engineer)."},
+    {"keywords": ["computer science", "computing", "information technology", "data science", "artificial intelligence", "cyber"], "regulator": "HEC / NCEAC (National Computing Education Accreditation Council)", "key": "HEC", "check": "Institution HEC-recognised; check NCEAC accreditation status of the computing program."},
+    {"keywords": ["business", "bba", "mba", "management", "commerce", "accounting"], "regulator": "HEC / NBEAC (National Business Education Accreditation Council)", "key": "HEC", "check": "Institution HEC-recognised; check NBEAC accreditation of the business program. ACCA/ICAP are separate professional bodies."},
+    {"keywords": ["pharmacy", "pharm-d", "pharmd"], "regulator": "Pharmacy Council of Pakistan", "key": "PCP", "check": "Pharm-D program approved/accredited by the Pharmacy Council."},
+    {"keywords": ["nursing", "midwifery"], "regulator": "Pakistan Nursing and Midwifery Council", "key": "PNMC", "check": "Nursing program registered/accredited with the council."},
+    {"keywords": ["veterinary", "dvm"], "regulator": "Pakistan Veterinary Medical Council", "key": "PVMC", "check": "DVM program recognised by the council."},
+    {"keywords": ["architecture", "town planning"], "regulator": "PCATP (Pakistan Council of Architects and Town Planners)", "key": "PCATP", "check": "Program recognised for architect registration."},
+    {"keywords": ["law", "llb"], "regulator": "Pakistan Bar Council / HEC", "key": "PBC", "check": "LLB program recognised by the Bar Council (entry/eligibility rules for practice)."},
+    {"keywords": ["physiotherapy", "dpt", "allied health", "medical lab", "radiology"], "regulator": "HEC and the provincial health regulator / allied-health council", "key": "HEC", "check": "Program recognised by HEC; verify the relevant provincial or national allied-health council requirements."}
+  ]
+}

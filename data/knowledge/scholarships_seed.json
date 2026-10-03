@@ -1,0 +1,17 @@
+{
+  "note": "Where to look - NOT a statement of current availability. Amounts, deadlines and eligibility change every cycle; always read the official page.",
+  "programmes": [
+    {"name": "HEC Pakistan scholarship programmes (need-based, Pakistan & overseas)", "provider": "Higher Education Commission", "level": "UG/PG/PhD", "official_domain": "hec.gov.pk"},
+    {"name": "Fulbright Scholarship Pakistan", "provider": "USEFP / US Department of State", "level": "Masters/PhD", "official_domain": "usefp.org"},
+    {"name": "Chevening Scholarships", "provider": "UK Foreign, Commonwealth & Development Office", "level": "Masters", "official_domain": "chevening.org"},
+    {"name": "Commonwealth Scholarships", "provider": "Commonwealth Scholarship Commission (UK)", "level": "Masters/PhD", "official_domain": "cscuk.fcdo.gov.uk"},
+    {"name": "DAAD scholarships for Pakistan", "provider": "German Academic Exchange Service", "level": "Masters/PhD", "official_domain": "daad.de / daad.pk"},
+    {"name": "Erasmus Mundus Joint Masters", "provider": "European Commission", "level": "Masters", "official_domain": "erasmus-plus.ec.europa.eu"},
+    {"name": "Punjab Educational Endowment Fund (PEEF)", "provider": "Government of Punjab", "level": "UG (Punjab domicile)", "official_domain": "peef.org.pk"},
+    {"name": "NUST financial aid & merit scholarships", "provider": "NUST", "level": "UG", "official_domain": "nust.edu.pk"},
+    {"name": "Chinese Government Scholarship (CSC)", "provider": "China Scholarship Council", "level": "UG/PG/PhD", "official_domain": "campuschina.org / csc.edu.cn"},
+    {"name": "Turkiye Burslari", "provider": "Government of Turkiye", "level": "UG/PG/PhD", "official_domain": "turkiyeburslari.gov.tr"},
+    {"name": "Stipendium Hungaricum", "provider": "Government of Hungary", "level": "UG/PG/PhD", "official_domain": "stipendiumhungaricum.hu"},
+    {"name": "Aga Khan University financial assistance", "provider": "AKU", "level": "UG/PG", "official_domain": "aku.edu"}
+  ]
+}

@@ -9,3 +9,4 @@ data/memory/
 *.log
 .DS_Store
 faiss_index/*.npy
+data/knowledge/*.local.json

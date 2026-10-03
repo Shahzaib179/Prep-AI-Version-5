@@ -255,30 +255,22 @@ Scores live in `mastery_model.py` and are recomputed from the raw answers after 
 
 On first start after upgrading, old stored scores are recalculated automatically (`PRAGMA user_version`).
 
-## V4.1 Admission Intelligence Agents
 
-### Merit Aggregate Agent
+## V5 — CrewAI agents: Merit Advisor and Path Finder
 
-This agent is implemented with CrewAI and is designed for Pakistan admission routes including MDCAT, ECAT, NUMS, NTS/NAT and NUST NET. It does **not** hard-code one universal merit formula. The student supplies the institution/program where possible; the agent researches the relevant policy, verifies the weighting, calculates the aggregate with a deterministic calculator tool, then compares the result with the most recent historical merit/closing information it can verify.
+Two new sidebar pages. Full tool/platform details: `docs/AGENTS_AND_TOOLS.md`.
 
-Important: historical closing merit is evidence, not a guarantee. If a formula, cutoff, eligibility rule, fee, deadline, or merit list cannot be verified, the agent must say so.
+* **Merit Advisor** — deterministic aggregate for MDCAT, NUMS, ECAT, NUST NET, FAST, NTS-based universities and custom weights; Agent 1 verifies the formula on the official prospectus, Agent 2 finds previous-year closing merits (only quote-verified numbers are kept), the app bands each option Safe / Target / Reach / Unlikely, and Agent 3 explains the result. You can also upload your own closing-merit CSV.
+* **Path Finder** — Career Explorer → Program Scout → Eligibility & Accreditation Verifier → Scholarship Scout → Roadmap Planner. Claims carry source URL + quote and are re-checked against the fetched page; unverifiable items are labelled, never filled in.
 
-### Path Finder Agent
+New files: `crew_agents/` (agents, tools, formulas), `views_agents.py` (pages), `data/knowledge/*.json` (regulator and scholarship starter maps), `tests/test_core.py`.
 
-The Path Finder Agent uses CrewAI to research career directions, university programs, eligibility, recognition/accreditation, scholarships and a practical roadmap. It prioritizes official sources and marks unverified information instead of filling gaps from model knowledge.
+Install and test:
 
-### Agent tools
+```bash
+pip install -r requirements.txt
+python -m unittest discover -s tests -v      # no network or API key needed
+streamlit run app.py
+```
 
-1. **Admission Web Research Tool** — DDGS metasearch for current admission policies, merit lists, scholarships, programs and eligibility.
-2. **Admission Page Extract Tool** — DDGS URL extraction for checking the actual text of important public pages.
-3. **Merit Calculator Tool** — deterministic weighted-average calculator; weights must total 100%.
-4. **Groq LLM** — CrewAI agents use the existing `GROQ_API_KEY` through Groq's OpenAI-compatible endpoint.
-5. **SQLite + semantic memory** — agent requests/responses are saved against the current Student ID.
-
-### Trusted-source policy
-
-The agents prioritize official university, HEC, PEC, PMDC/UHS/NUMS, NTS and government sources. Third-party historical cutoff pages may be used only when an official historical source cannot be found, and they must be labeled as secondary evidence.
-
-### Why this design?
-
-CrewAI provides role-based agents, tools, tasks and Crews; the deterministic calculator remains normal Python/tool logic so arithmetic is not left to the LLM. This follows a hybrid agentic architecture: AI decides what evidence to research and how to explain it, while deterministic code performs the final calculation.
+Important: merit formulas are marked **provisional** until you confirm them against the current prospectus (sources disagree for ECAT and NUMS). Edit `crew_agents/merit/formulas.py` and set `status="verified-official"` once confirmed.

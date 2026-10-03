@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import os
-import re
 import time
 from datetime import date
 
@@ -10,7 +9,6 @@ import streamlit as st
 
 from adaptive import difficulty_for_topic, next_best_action
 from agent_system import AgentContext, Orchestrator
-from admission_agents import MeritAggregateAgent, PathFinderAgent
 from config import DEFAULT_GROQ_MODEL, GROQ_MODELS, UI_COLORS, get_student_id
 from db import (
     add_achievement,
@@ -41,6 +39,7 @@ from pdf_export import questions_to_pdf, text_to_pdf, research_to_pdf
 from rag import build_index, hybrid_search, load_database_index
 from ui import apply_theme, hero, source_cards
 from voice_service import speak, transcribe
+from views_agents import render_merit_advisor, render_pathfinder
 
 
 st.set_page_config(
@@ -182,7 +181,7 @@ with st.sidebar:
             "AI Tutor",
             "Voice Tutor",
             "Research Agent",
-            "Merit & Admissions",
+            "Merit Advisor",
             "Path Finder",
             "Study Plan",
             "Memory",
@@ -206,7 +205,7 @@ with st.sidebar:
         st.rerun()
 
     st.divider()
-    st.caption("V4 = Adaptive learning + long-term memory + multi-agent AI")
+    st.caption("V5 = Adaptive learning + memory + CrewAI agents (Merit Advisor, Path Finder)")
 
 orch = Orchestrator(student_id)
 
@@ -1197,135 +1196,6 @@ def render_research() -> None:
 
 
 # -----------------------------------------------------------------------------
-# Merit Aggregate Agent + Path Finder Agent
-# -----------------------------------------------------------------------------
-def _render_agent_output(text: str) -> None:
-    """Render CrewAI output without pretending unverified claims are facts."""
-    st.markdown(text)
-    urls = sorted(set(re.findall(r"https?://[^\s)\]>]+", text or "")))
-    if urls:
-        st.markdown("### 🔗 URLs cited by the agent")
-        for url in urls[:20]:
-            st.markdown(f"- {url}")
-
-
-def render_merit_admissions() -> None:
-    hero(
-        "🏆 Merit & Admissions Agent",
-        "Calculate a merit aggregate and research historical admission competitiveness using verified sources.",
-    )
-    st.info(
-        "This agent does not assume one universal formula. ECAT and NTS, for example, can be used by different institutions with different rules. "
-        "The agent researches the relevant institution/program first and labels anything it cannot verify."
-    )
-
-    exam = st.selectbox("Exam / admission route", ["MDCAT", "ECAT", "NUMS", "NTS", "NUST NET"])
-    institution = st.text_input(
-        "University / admitting institution",
-        placeholder="e.g. UET Lahore, NUST, NUMS, UHS, FAST",
-        help="Important for ECAT/NTS and recommended for all routes.",
-    )
-    program = st.text_input("Program", placeholder="e.g. MBBS, BDS, BS Computer Science, Engineering")
-
-    st.markdown("### Your scores")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        test_score = st.number_input(f"{exam} / entry-test score (%)", 0.0, 100.0, 0.0, step=0.1)
-    with c2:
-        hssc_score = st.number_input("HSSC / FSc / A-Level equivalent (%)", 0.0, 100.0, 0.0, step=0.1)
-    with c3:
-        ssc_score = st.number_input("SSC / Matric / O-Level equivalent (%)", 0.0, 100.0, 0.0, step=0.1)
-    extra_scores = st.text_area(
-        "Other scores (optional)",
-        placeholder="Example: SAT 1320; interview 82%; additional mathematics 78%",
-    )
-    notes = st.text_area(
-        "Additional information / target universities",
-        placeholder="Example: I want public-sector MBBS in Punjab and want to know whether my aggregate is competitive.",
-    )
-
-    if st.button("🔎 Calculate Merit & Research Admissions", type="primary"):
-        if test_score <= 0:
-            st.warning("Enter your entry-test score so the agent has enough information to research and calculate your aggregate.")
-            return
-        try:
-            agent = MeritAggregateAgent()
-            with st.spinner("Researching official admission policies and previous merit information..."):
-                result = agent.run(
-                    student_id=student_id,
-                    exam=exam,
-                    institution=institution.strip(),
-                    program=program.strip(),
-                    scores={
-                        "entry_test": test_score,
-                        "hssc": hssc_score,
-                        "ssc": ssc_score,
-                        "other_scores": extra_scores.strip(),
-                    },
-                    query_notes=notes.strip(),
-                    model=st.session_state.llm_model,
-                )
-            st.success("Merit analysis completed.")
-            _render_agent_output(result.answer)
-        except Exception as exc:
-            st.error("The Merit Aggregate Agent could not complete the request.")
-            if st.session_state.get("debug_mode"):
-                st.exception(exc)
-            else:
-                st.caption(f"Technical detail: {str(exc)[:400]}")
-
-
-def render_path_finder() -> None:
-    hero(
-        "🧭 Path Finder",
-        "Explore education and career routes with eligibility, recognition, scholarships and a personalized roadmap.",
-    )
-    st.warning(
-        "Admission rules, fees, scholarships, deadlines and accreditation can change. Path Finder reports what it can verify from sources and explicitly marks information that still needs confirmation."
-    )
-
-    c1, c2 = st.columns(2)
-    with c1:
-        education = st.selectbox("Current education level", ["Matric / SSC", "Intermediate / HSSC", "A-Level", "Diploma / DAE", "Bachelor's", "Other"])
-        background = st.text_input("Academic background", placeholder="e.g. FSc Pre-Medical, Pre-Engineering, ICS")
-        marks = st.text_input("Marks / grades / test scores", placeholder="e.g. SSC 92%, HSSC 88%, MDCAT 84%")
-        location = st.text_input("Preferred location", placeholder="e.g. Lahore, Islamabad, Punjab, Pakistan / flexible")
-    with c2:
-        interests = st.text_area("Interests and strengths", placeholder="e.g. biology, problem solving, programming, research, design")
-        fields = st.text_input("Preferred fields", placeholder="e.g. Medicine, Computer Science, Engineering, Data Science")
-        budget = st.text_input("Budget / financial constraints", placeholder="e.g. Public universities preferred; scholarship needed")
-        goals = st.text_area("Career goals", placeholder="e.g. Want a stable career with postgraduate opportunities and international mobility")
-
-    if st.button("🧭 Find My Education & Career Path", type="primary"):
-        if not background.strip() or not interests.strip():
-            st.warning("Please provide at least your academic background and interests so Path Finder can make a meaningful recommendation.")
-            return
-        try:
-            agent = PathFinderAgent()
-            with st.spinner("Researching universities, eligibility, recognition, scholarships and career pathways..."):
-                result = agent.run(
-                    student_id=student_id,
-                    education_level=education,
-                    background=background.strip(),
-                    marks=marks.strip(),
-                    interests=interests.strip(),
-                    preferred_fields=fields.strip(),
-                    location=location.strip(),
-                    budget=budget.strip(),
-                    goals=goals.strip(),
-                    model=st.session_state.llm_model,
-                )
-            st.success("Path Finder analysis completed.")
-            _render_agent_output(result.answer)
-        except Exception as exc:
-            st.error("Path Finder could not complete the request.")
-            if st.session_state.get("debug_mode"):
-                st.exception(exc)
-            else:
-                st.caption(f"Technical detail: {str(exc)[:400]}")
-
-
-# -----------------------------------------------------------------------------
 # Study plan / memory / history / settings
 # -----------------------------------------------------------------------------
 def render_plan() -> None:
@@ -1522,8 +1392,8 @@ routes = {
     "AI Tutor": render_tutor,
     "Voice Tutor": render_voice_tutor,
     "Research Agent": render_research,
-    "Merit & Admissions": render_merit_admissions,
-    "Path Finder": render_path_finder,
+    "Merit Advisor": lambda: render_merit_advisor(student_id, st.session_state.student_name, st.session_state.llm_model),
+    "Path Finder": lambda: render_pathfinder(student_id, st.session_state.student_name, st.session_state.llm_model),
     "Study Plan": render_plan,
     "Memory": render_memory,
     "History": render_history,
