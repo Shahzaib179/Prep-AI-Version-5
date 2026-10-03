@@ -94,11 +94,31 @@ class AgentResult:
     raw: str = ""
 
 
+def _normalize_groq_model(model: str | None = None) -> str:
+    """Return the exact Groq model identifier expected by the API.
+
+    Older saved settings may contain ``gpt-oss-20b`` without the provider
+    prefix. Groq expects the OpenAI-compatible model IDs below.
+    """
+    chosen = _clean(model or DEFAULT_GROQ_MODEL)
+    aliases = {
+        "gpt-oss-20b": "openai/gpt-oss-20b",
+        "openai/gpt-oss-20b": "openai/gpt-oss-20b",
+        "groq/gpt-oss-20b": "openai/gpt-oss-20b",
+        "groq/openai/gpt-oss-20b": "openai/gpt-oss-20b",
+        "gpt-oss-120b": "openai/gpt-oss-120b",
+        "openai/gpt-oss-120b": "openai/gpt-oss-120b",
+        "groq/gpt-oss-120b": "openai/gpt-oss-120b",
+        "groq/openai/gpt-oss-120b": "openai/gpt-oss-120b",
+    }
+    return aliases.get(chosen, chosen)
+
+
 def _make_llm(model: str | None = None) -> LLM:
     key = _clean(get_secret("GROQ_API_KEY"))
     if not key:
         raise GroqServiceError("GROQ_API_KEY is missing. Add it to Streamlit Secrets.")
-    chosen = model or DEFAULT_GROQ_MODEL
+    chosen = _normalize_groq_model(model)
     return LLM(
         model=chosen,
         custom_openai=True,
